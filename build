@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+RELEASE_NAME=raylib-6.0_macos
+
+if [ ! -d "${RELEASE_NAME}" ]; then
+    echo "Getting raylib for macos..."
+    curl -LO --fail https://github.com/raysan5/raylib/releases/download/6.0/${RELEASE_NAME}.tar.gz
+    tar -xf "${RELEASE_NAME}.tar.gz"
+fi
+
+INCLUDE="-I./${RELEASE_NAME}/include"
+FRAMEWORKS="-framework IOKit -framework Cocoa -framework OpenGL"
+LIBS="-L./${RELEASE_NAME}/lib -lraylib"
+RPATH="-Wl,-rpath,./${RELEASE_NAME}/lib"
+
+clang main.c \
+${INCLUDE} \
+${FRAMEWORKS} \
+${LIBS} \
+${RPATH}
