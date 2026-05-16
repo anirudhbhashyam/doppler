@@ -1,7 +1,5 @@
 #include <stdio.h>
 #include <stdint.h>
-#include <string.h>
-#include <errno.h>
 
 #include "raylib.h"
 #include "raymath.h"
