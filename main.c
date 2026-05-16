@@ -8,7 +8,7 @@
 
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
-#define WAVES_MAX_SIZE 1024
+#define WAVES_MAX_SIZE 2048
 
 // Assuming: RRGGBBAA
 #define HEX_TO_COLOR(x) (Color) { .r = ((x) >> 8 * 3) & 0xff, .g = ((x) >> 8 * 2) & 0xff, .b = ((x) >> 8 * 1) & 0xff, .a = ((x) >> 8 * 0) & 0xff }
@@ -40,7 +40,7 @@ void update_particle(Particle* particle, float dt) {
         particle->position,
         Vector2Add(ut, Vector2Scale(particle->acceleration, 0.5 * dt * dt))
     );
-    particle->velocity = Vector2Add(particle->velocity, ut);
+    particle->velocity = Vector2Add(particle->velocity, Vector2Scale(particle->acceleration, dt));
 }
 
 void emit_waveform(Particle* particle) {
@@ -66,11 +66,11 @@ int32_t main() {
             .y = WINDOW_HEIGHT / 2
         },
         .velocity = {
-            .x = 100.0f,
+            .x = 10.0f,
             .y = 0.0f
         },
         .acceleration = {
-            .x = 0.01f,
+            .x = 10.0f,
             .y = 0.0f
         },
         .radius = 10.0f,
@@ -79,7 +79,7 @@ int32_t main() {
 
     SetTargetFPS(60);
     float time_elapsed = 0.0f;
-    const float delay = 0.2f;
+    const float delay = 0.1f;
     while (!WindowShouldClose()) {
         const float dt = GetFrameTime();
         time_elapsed += dt;
