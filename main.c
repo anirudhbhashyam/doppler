@@ -32,7 +32,6 @@ typedef struct {
 } WaveForm;
 
 size_t wave_count = 0;
-size_t emitted_count = 0;
 static WaveForm waves[WAVES_MAX_SIZE];
 
 void update_particle(Particle* particle, float dt) {
@@ -47,7 +46,7 @@ void update_particle(Particle* particle, float dt) {
 void emit_waveform(Particle* particle) {
     WaveForm wave = {
         .center = particle->position,
-        .velocity = 200.0f,
+        .velocity = 100.0f,
         .radius = particle->radius,
         .color = HEX_TO_COLOR(0x7f8ca1aa),
         .phase = wave_count + 2.0f,
