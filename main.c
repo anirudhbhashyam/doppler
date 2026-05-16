@@ -44,6 +44,7 @@ void update_particle(Particle* particle, float dt) {
 }
 
 void emit_waveform(Particle* particle) {
+    if (wave_count >= WAVES_MAX_SIZE) return;
     WaveForm wave = {
         .center = particle->position,
         .velocity = 100.0f,
