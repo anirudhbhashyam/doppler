@@ -73,7 +73,7 @@ int32_t main() {
             .x = 10.0f,
             .y = 0.0f
         },
-        .radius = 10.0f,
+        .radius = 5.0f,
         .color = HEX_TO_COLOR(0xfe166daa)
     };
 
@@ -100,5 +100,6 @@ int32_t main() {
             }
         EndDrawing();
     }
+    CloseWindow();
     return 0;
 }
