@@ -48,7 +48,7 @@ void emit_waveform(Particle* particle) {
         .velocity = 100.0f,
         .radius = particle->radius,
         .color = HEX_TO_COLOR(0x7f8ca1aa),
-        .phase = wave_count + 2.0f,
+        .phase = 0.0f
     };
     waves[wave_count++] = wave;
 }
