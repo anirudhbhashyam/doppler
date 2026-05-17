@@ -10,6 +10,8 @@ if [ ! -d "${RELEASE_NAME}" ]; then
     log "Getting raylib for macos...\n"
     curl -LO --fail https://github.com/raysan5/raylib/releases/download/6.0/${RELEASE_NAME}.tar.gz
     tar -xf "${RELEASE_NAME}.tar.gz"
+    log "Cleanup ${RELEASE_NAME}.tar.gz"
+    rm -f "${RELEASE_NAME}.tar.gz"
 fi
 
 INCLUDE="-I./${RELEASE_NAME}/include"
