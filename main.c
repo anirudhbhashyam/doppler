@@ -83,7 +83,6 @@ int32_t main() {
         const float dt = GetFrameTime();
         time_elapsed += dt;
         update_particle(&particle, dt);
-        printf("particle position: %f, %f\n", particle.position.x, particle.position.y);
         if (time_elapsed >= delay) {
             emit_waveform(&particle);
             time_elapsed = 0;
