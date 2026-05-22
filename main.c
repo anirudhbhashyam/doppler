@@ -7,6 +7,7 @@
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
 #define WAVES_MAX_SIZE 2048
+#define TRAIL_MAX_SIZE 10
 
 // Assuming: RRGGBBAA
 #define HEX_TO_COLOR(x) (Color) { .r = ((x) >> 8 * 3) & 0xff, .g = ((x) >> 8 * 2) & 0xff, .b = ((x) >> 8 * 1) & 0xff, .a = ((x) >> 8 * 0) & 0xff }
@@ -28,6 +29,26 @@ typedef struct {
     Color color;
     float phase;
 } WaveForm;
+
+size_t trail_count = 0;
+static Particle trail[TRAIL_MAX_SIZE] = { 0 };
+
+void add_particle_to_trail(Particle particle) {
+    trail[trail_count++ % TRAIL_MAX_SIZE] = particle;
+}
+
+void render_trail() {
+    for (size_t i = 0; i < TRAIL_MAX_SIZE; ++i) {
+        Particle particle = trail[i];
+        Color faded_color = {
+            .r = particle.color.r,
+            .g = particle.color.g,
+            .b = particle.color.b,
+            .a = (uint8_t)((float) particle.color.a * (float) i / (float) TRAIL_MAX_SIZE)
+        };
+        DrawCircleV(particle.position, particle.radius, faded_color);
+    }
+}
 
 size_t wave_count = 0;
 static WaveForm waves[WAVES_MAX_SIZE] = { 0 };
@@ -82,6 +103,14 @@ int32_t main() {
     while (!WindowShouldClose()) {
         const float dt = GetFrameTime();
         time_elapsed += dt;
+        add_particle_to_trail(particle);
+#if 0
+        for (size_t i = 0; i < TRAIL_MAX_SIZE; ++i) {
+            printf("%f, %f\n", trail[i].position.x, trail[i].position.y);
+        }
+        printf("\n");
+#endif
+
         update_particle(&particle, dt);
         if (time_elapsed >= delay) {
             emit_waveform(&particle);
@@ -96,6 +125,7 @@ int32_t main() {
             for (size_t i = 0; i < wave_count; ++i) {
                 draw_waveform(&waves[i]);
             }
+            render_trail();
         EndDrawing();
     }
     CloseWindow();
