@@ -30,7 +30,7 @@ typedef struct {
 } WaveForm;
 
 size_t wave_count = 0;
-static WaveForm waves[WAVES_MAX_SIZE];
+static WaveForm waves[WAVES_MAX_SIZE] = { 0 };
 
 void update_particle(Particle* particle, float dt) {
     Vector2 ut = Vector2Scale(particle->velocity, dt);
