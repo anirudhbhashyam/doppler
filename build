@@ -7,7 +7,7 @@ log() {
 }
 
 if [ ! -d "${RELEASE_NAME}" ]; then
-    log "Getting raylib for macos...\n"
+    log "Getting raylib for macos..."
     curl -LO --fail https://github.com/raysan5/raylib/releases/download/6.0/${RELEASE_NAME}.tar.gz
     tar -xf "${RELEASE_NAME}.tar.gz"
     log "Cleanup ${RELEASE_NAME}.tar.gz"
@@ -19,8 +19,10 @@ FRAMEWORKS="-framework IOKit -framework Cocoa -framework OpenGL"
 LIBS="-L./${RELEASE_NAME}/lib -lraylib"
 RPATH="-Wl,-rpath,./${RELEASE_NAME}/lib"
 
+log "Compiling..."
 clang main.c \
 ${INCLUDE} \
 ${FRAMEWORKS} \
 ${LIBS} \
 ${RPATH}
+log "Saved executable to a.out"
