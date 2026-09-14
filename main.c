@@ -1,13 +1,14 @@
 #include <stdio.h>
 #include <stdint.h>
 
+#include "raylib-6.0_macos/include/raylib.h"
 #include "raylib.h"
 #include "raymath.h"
 
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
 #define WAVES_MAX_SIZE 2048
-#define TRAIL_MAX_SIZE 10
+#define TRAIL_MAX_SIZE 60
 
 // Assuming: RRGGBBAA
 #define HEX_TO_COLOR(x) (Color) { .r = ((x) >> 8 * 3) & 0xff, .g = ((x) >> 8 * 2) & 0xff, .b = ((x) >> 8 * 1) & 0xff, .a = ((x) >> 8 * 0) & 0xff }
@@ -34,19 +35,30 @@ size_t trail_count = 0;
 static Particle trail[TRAIL_MAX_SIZE] = { 0 };
 
 void add_particle_to_trail(Particle particle) {
+    // Acts like a ring buffer
     trail[trail_count++ % TRAIL_MAX_SIZE] = particle;
 }
 
-void render_trail() {
-    for (size_t i = 0; i < TRAIL_MAX_SIZE; ++i) {
-        Particle particle = trail[i];
-        Color faded_color = {
-            .r = particle.color.r,
-            .g = particle.color.g,
-            .b = particle.color.b,
-            .a = (uint8_t)((float) particle.color.a * (float) i / (float) TRAIL_MAX_SIZE)
-        };
-        DrawCircleV(particle.position, particle.radius, faded_color);
+void render_trail(float fade_factor) {
+    size_t trail_len = (trail_count < TRAIL_MAX_SIZE) ? trail_count : TRAIL_MAX_SIZE;
+    if (trail_len <= 0) return;
+
+    size_t start = (trail_count >= TRAIL_MAX_SIZE) ? trail_count % TRAIL_MAX_SIZE : 0;
+
+    for (size_t age = 0; age < trail_len; ++age) {
+        size_t index = (start + age) % TRAIL_MAX_SIZE;
+        Particle particle = trail[index];
+        float fade = (age + 1) / (float) trail_len;
+        DrawCircleV(
+            particle.position,
+            particle.radius,
+            (Color) {
+                .r = particle.color.r,
+                .g = particle.color.g,
+                .b = particle.color.b,
+                .a = (uint8_t) ((float) particle.color.a * fade * fade_factor)
+            }
+        );
     }
 }
 
@@ -79,6 +91,7 @@ void draw_waveform(WaveForm* wave) {
 }
 
 int32_t main() {
+    SetConfigFlags(FLAG_MSAA_4X_HINT);
     InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Doppler");
     Particle particle = {
         .position = {
@@ -97,35 +110,37 @@ int32_t main() {
         .color = HEX_TO_COLOR(0xfe166daa)
     };
 
-    SetTargetFPS(60);
+    SetTargetFPS(120);
     float time_elapsed = 0.0f;
+    float trail_time_elapsed = 0.0f;
     const float delay = 0.1f;
+    const float trail_delay = 0.03f;
     while (!WindowShouldClose()) {
         const float dt = GetFrameTime();
         time_elapsed += dt;
-        add_particle_to_trail(particle);
-#if 0
-        for (size_t i = 0; i < TRAIL_MAX_SIZE; ++i) {
-            printf("%f, %f\n", trail[i].position.x, trail[i].position.y);
-        }
-        printf("\n");
-#endif
+        trail_time_elapsed += dt;
 
         update_particle(&particle, dt);
         if (time_elapsed >= delay) {
             emit_waveform(&particle);
+            add_particle_to_trail(particle);
             time_elapsed = 0;
+        }
+
+        if (trail_time_elapsed >= trail_delay) {
+            add_particle_to_trail(particle);
+            trail_time_elapsed = 0;
         }
         for (size_t i = 0; i < wave_count; ++i) {
             waves[i].radius += waves[i].velocity * dt;
         }
         BeginDrawing();
             ClearBackground(BACKGROUND_COLOR);
+            render_trail(0.2f);
             DrawCircleV(particle.position, particle.radius, particle.color);
             for (size_t i = 0; i < wave_count; ++i) {
                 draw_waveform(&waves[i]);
             }
-            render_trail();
         EndDrawing();
     }
     CloseWindow();
