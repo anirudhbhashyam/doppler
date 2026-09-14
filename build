@@ -18,11 +18,13 @@ INCLUDE="-I./${RELEASE_NAME}/include"
 FRAMEWORKS="-framework IOKit -framework Cocoa -framework OpenGL"
 LIBS="-L./${RELEASE_NAME}/lib -lraylib"
 RPATH="-Wl,-rpath,./${RELEASE_NAME}/lib"
+FLAGS="-Wall -Wextra -Werror"
 
 log "Compiling..."
 clang main.c \
 ${INCLUDE} \
 ${FRAMEWORKS} \
 ${LIBS} \
-${RPATH}
+${RPATH} \
+${FLAGS}
 log "Saved executable to a.out"
