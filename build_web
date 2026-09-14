@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+
+RELEASE_NAME="raylib-6.0_webassembly"
+OUT_PATH="web"
+
+log() {
+    printf '  \033[32m>\033[0m %s\n' "$1"
+}
+
+if [ ! -d "${RELEASE_NAME}" ]; then
+    log "Getting raylib webassembly build..."
+    curl -LO --fail https://github.com/raysan5/raylib/releases/download/6.0/${RELEASE_NAME}.zip
+    tar -xf "${RELEASE_NAME}.zip"
+    log "Cleanup ${RELEASE_NAME}.zip"
+    rm -f "${RELEASE_NAME}.zip"
+fi
+
+INCLUDE="-I./${RELEASE_NAME}/include"
+LIBS="./${RELEASE_NAME}/lib/libraylib.web.a"
+
+if [[ ! -d "${OUT_PATH}" ]]; then
+    mkdir "${OUT_PATH}"
+fi
+
+emcc main.c \
+${INCLUDE} \
+${LIBS} \
+${RPATH} \
+-DPLATFORM_WEB \
+-s USE_GLFW=3 \
+-Os \
+--shell-file shell.html \
+-o "${OUT_PATH}/index.html"
